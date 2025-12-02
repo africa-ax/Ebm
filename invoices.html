@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - Rwanda Commerce</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Invoices</h1>
+            <div class="header-actions">
+                <span id="user-info"></span>
+                <button id="back-btn" class="btn btn-secondary">Back to Dashboard</button>
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+            <section class="section">
+                <h2>My Invoices</h2>
+                <div class="filter-box">
+                    <input type="date" id="filter-date-from">
+                    <input type="date" id="filter-date-to">
+                    <select id="filter-type">
+                        <option value="all">All Types</option>
+                        <option value="sales">Sales (I Sold)</option>
+                        <option value="purchases">Purchases (I Bought)</option>
+                    </select>
+                    <button id="apply-filter-btn" class="btn btn-primary">Apply Filter</button>
+                </div>
+                <div id="invoices-list" class="invoices-list"></div>
+            </section>
+            
+            <div id="message" class="message"></div>
+        </main>
+    </div>
+    
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content large">
+            <span class="close">&times;</span>
+            <div id="invoice-details" class="invoice-display"></div>
+            <button id="print-invoice-btn" class="btn btn-primary">Print Invoice</button>
+        </div>
+    </div>
+    
+    <script type="module" src="js/invoices.js"></script>
+</body>
+</html>

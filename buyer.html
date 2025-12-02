@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Dashboard - Rwanda Commerce</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Buyer Dashboard</h1>
+            <div class="header-actions">
+                <span id="user-info"></span>
+                <a href="invoices.html" class="btn btn-secondary">View Invoices</a>
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="search">Search Sellers</button>
+                <button class="tab-btn" data-tab="cart">Cart <span id="cart-count" class="badge">0</span></button>
+                <button class="tab-btn" data-tab="requests">My Requests</button>
+                <button class="tab-btn" data-tab="mystock">My Stock</button>
+            </div>
+            
+            <div id="search-tab" class="tab-content active">
+                <section class="section">
+                    <h2>Search Sellers</h2>
+                    <div class="search-box">
+                        <input type="text" id="search-sellers" placeholder="Search by business name or TIN...">
+                    </div>
+                    <div id="sellers-list" class="sellers-list"></div>
+                </section>
+            </div>
+            
+            <div id="cart-tab" class="tab-content">
+                <section class="section">
+                    <h2>Shopping Cart</h2>
+                    <div id="cart-items" class="cart-items"></div>
+                    <div class="cart-summary">
+                        <h3>Total: <span id="cart-total">0</span> RWF</h3>
+                        <button id="submit-request-btn" class="btn btn-primary">Submit Purchase Request</button>
+                    </div>
+                </section>
+            </div>
+            
+            <div id="requests-tab" class="tab-content">
+                <section class="section">
+                    <h2>My Purchase Requests</h2>
+                    <div class="filter-box">
+                        <select id="filter-my-status">
+                            <option value="all">All Requests</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div id="my-requests-list" class="requests-list"></div>
+                </section>
+            </div>
+            
+            <div id="mystock-tab" class="tab-content">
+                <section class="section">
+                    <h2>My Stock</h2>
+                    <div class="search-box">
+                        <input type="text" id="search-my-stock" placeholder="Search my stock...">
+                    </div>
+                    <div id="my-stock-list" class="stock-list"></div>
+                </section>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </main>
+    </div>
+    
+    <div id="seller-stock-modal" class="modal">
+        <div class="modal-content large">
+            <span class="close">&times;</span>
+            <h2 id="seller-name"></h2>
+            <div class="search-box">
+                <input type="text" id="search-seller-stock" placeholder="Search products...">
+            </div>
+            <div id="seller-stock-list" class="products-list"></div>
+        </div>
+    </div>
+    
+    <script type="module" src="js/buyer.js"></script>
+</body>
+</html>

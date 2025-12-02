@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manufacturer Dashboard - Rwanda Commerce</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Manufacturer Dashboard</h1>
+            <div class="header-actions">
+                <span id="user-info"></span>
+                <a href="invoices.html" class="btn btn-secondary">View Invoices</a>
+                <button id="logout-btn" class="btn btn-danger">Logout</button>
+            </div>
+        </header>
+        
+        <main>
+            <section class="section">
+                <h2>Add New Product</h2>
+                <form id="product-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="product-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Unit</label>
+                            <select id="product-unit" required>
+                                <option value="">Select Unit</option>
+                                <option value="PCS">Pieces (PCS)</option>
+                                <option value="KG">Kilograms (KG)</option>
+                                <option value="L">Liters (L)</option>
+                                <option value="M">Meters (M)</option>
+                                <option value="BOX">Box</option>
+                                <option value="PACK">Pack</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tax Category</label>
+                            <select id="product-tax-category" required>
+                                <option value="">Select Tax Category</option>
+                                <option value="A">A - 18% VAT</option>
+                                <option value="B">B - 0% VAT</option>
+                                <option value="C">C - Exempt</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Barcode</label>
+                            <input type="text" id="product-barcode">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>EBM Product Code</label>
+                        <input type="text" id="product-ebm-code" required>
+                        <small>Official EBM product classification code</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="product-description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                </form>
+            </section>
+            
+            <section class="section">
+                <h2>My Products</h2>
+                <div class="search-box">
+                    <input type="text" id="search-products" placeholder="Search products...">
+                </div>
+                <div id="products-list" class="products-list"></div>
+            </section>
+            
+            <div id="message" class="message"></div>
+        </main>
+    </div>
+    
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Product</h2>
+            <form id="edit-product-form">
+                <input type="hidden" id="edit-product-id">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="edit-product-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit</label>
+                    <select id="edit-product-unit" required>
+                        <option value="PCS">Pieces (PCS)</option>
+                        <option value="KG">Kilograms (KG)</option>
+                        <option value="L">Liters (L)</option>
+                        <option value="M">Meters (M)</option>
+                        <option value="BOX">Box</option>
+                        <option value="PACK">Pack</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tax Category</label>
+                    <select id="edit-product-tax-category" required>
+                        <option value="A">A - 18% VAT</option>
+                        <option value="B">B - 0% VAT</option>
+                        <option value="C">C - Exempt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <input type="text" id="edit-product-barcode">
+                </div>
+                <div class="form-group">
+                    <label>EBM Product Code</label>
+                    <input type="text" id="edit-product-ebm-code" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="edit-product-description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Product</button>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module" src="js/manufacturer.js"></script>
+</body>
+</html>
