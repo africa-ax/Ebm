@@ -1,5 +1,5 @@
-import firebaseConfig from '../firebase-config.js';
-import { sendInvoice } from '../ebm/ebmInterface.js';
+import firebaseConfig from './firebase-config.js';
+import { sendInvoice } from './ebm/ebmInterface.js';
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
