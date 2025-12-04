@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manufacturer Dashboard - EBM System</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         * {
             margin: 0;
@@ -220,6 +219,11 @@
             transform: scale(1.02);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .alert {
             padding: 15px;
             border-radius: 8px;
@@ -246,6 +250,63 @@
             padding-bottom: 10px;
             border-bottom: 3px solid #667eea;
         }
+
+        .product-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .product-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .edit-btn:hover {
+            background: #5568d3;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -261,6 +322,7 @@
         <div class="sidebar-header">Menu</div>
         <ul class="sidebar-menu">
             <li><a href="#" id="createProductLink">Create Product</a></li>
+            <li><a href="#" id="editProductLink">Edit Product</a></li>
             <li><a href="#" id="logoutLink">Logout</a></li>
         </ul>
     </div>
@@ -283,7 +345,7 @@
     <div class="content-section active" id="createProductSection">
         <h2 class="section-title">Create Product</h2>
         
-        <div class="alert" id="alertBox"></div>
+        <div class="alert" id="createAlertBox"></div>
 
         <form id="productForm">
             <!-- Basic Information -->
@@ -416,7 +478,115 @@
         </form>
     </div>
 
-    <script type="module" src="manufacturer.js"></script>
-</body>
-    </html>
+    <!-- Edit Product Section -->
+    <div class="content-section" id="editProductSection">
+        <h2 class="section-title">Edit Product</h2>
+        
+        <div class="alert" id="editAlertBox"></div>
+
+        <div class="product-list" id="productList">
+            <div class="loading">Loading products...</div>
+        </div>
+
+        <!-- Edit Form (Hidden until product selected) -->
+        <form id="editProductForm" style="display: none;">
+            <input type="hidden" id="editDocId">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product Name *</label>
+                    <input type="text" id="editProductName" required>
+                </div>
+                <div class="form-group">
+                    <label>Product ID *</label>
+                    <input type="text" id="editProductId" required readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Unit of Measure *</label>
+                    <select id="editUnitOfMeasure" required>
+                        <option value="">Select Unit</option>
+                        <option value="kg">Kilogram (kg)</option>
+                        <option value="g">Gram (g)</option>
+                        <option value="l">Liter (l)</option>
+                        <option value="ml">Milliliter (ml)</option>
+                        <option value="bottle">Bottle</option>
+                        <option value="packet">Packet</option>
+                        <option value="box">Box</option>
+                        <option value="piece">Piece</option>
+                        <option value="unit">Unit</option>
+                        <option value="dozen">Dozen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tax Category *</label>
+                    <select id="editTaxCategory" required>
+                        <option value="">Select Tax Category</option>
+                        <option value="A">A - Standard Rate</option>
+                        <option value="B">B - Reduced Rate</option>
+                        <option value="C">C - Zero Rate</option>
+                        <option value="D">D - Exempt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>VAT Type *</label>
+                    <select id="editVatType" required>
+                        <option value="">Select VAT Type</option>
+                        <option value="18">18% Standard</option>
+                        <option value="0">0% Zero Rated</option>
+                        <option value="exempt">Exempt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Product Category *</label>
+                    <select id="editProductCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="food">Food & Beverages</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="clothing">Clothing & Apparel</option>
+                        <option value="household">Household Items</option>
+                        <option value="medical">Medical Supplies</option>
+                        <option value="construction">Construction Materials</option>
+                        <option value="agriculture">Agriculture Products</option>
+                        <option value="services">Services</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Item Classification *</label>
+                    <select id="editItemClassification" required>
+                        <option value="">Select Classification</option>
+                        <option value="goods">Goods</option>
+                        <option value="services">Services</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Pricing Type *</label>
+                    <select id="editPricingType" required>
+                        <option value="">Select Pricing Type</option>
+                        <option value="fixed">Fixed Price</option>
+                        <option value="variable">Variable Price</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Unit Price *</label>
+                    <input type="number" id="editUnitPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>EBM Item Code</label>
+                    <input type="text" id="editEbmItemCode">
+                </div>
+    </div>
     
