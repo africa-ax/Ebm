@@ -1,7 +1,7 @@
 // Firebase Configuration
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getDatabase, ref, set, push, onValue, query, orderByChild, equalTo } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, set, push, onValue, query, orderByChild, equalTo, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB5uSxd29wVSWt65IQsfVBo86IQG234Nbo",
@@ -17,6 +17,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
+
+console.log('Firebase initialized successfully');
 
 // DOM Elements
 const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -41,6 +43,7 @@ onAuthStateChanged(auth, (user) => {
     // Start monitoring purchase requests
     monitorPurchaseRequests();
   } else {
+    console.log('No user authenticated - redirecting to auth page');
     // Redirect to auth page if not logged in
     window.location.href = 'auth.html';
   }
@@ -90,18 +93,13 @@ function monitorPurchaseRequests() {
   if (!currentUser) return;
 
   const purchaseRequestsRef = ref(database, 'purchaseRequests');
-  const manufacturerQuery = query(
-    purchaseRequestsRef,
-    orderByChild('manufacturerId'),
-    equalTo(currentUser.uid)
-  );
-
-  onValue(manufacturerQuery, (snapshot) => {
+  
+  onValue(purchaseRequestsRef, (snapshot) => {
     if (snapshot.exists()) {
       const requests = snapshot.val();
-      // Count pending requests only
+      // Count pending requests for this manufacturer
       const pendingCount = Object.values(requests).filter(
-        req => req.status === 'pending'
+        req => req.manufacturerId === currentUser.uid && req.status === 'pending'
       ).length;
 
       if (pendingCount > 0) {
@@ -113,17 +111,27 @@ function monitorPurchaseRequests() {
     } else {
       purchaseBadge.style.display = 'none';
     }
+  }, (error) => {
+    console.error('Error monitoring purchase requests:', error);
   });
 }
 
 // Product Form Submission
 productForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  console.log('Form submitted - starting product creation...');
 
   if (!currentUser) {
     showAlert('You must be logged in to create products', 'error');
+    console.error('No current user found');
     return;
   }
+
+  // Disable submit button to prevent double submission
+  const submitBtn = productForm.querySelector('.submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Creating Product...';
 
   // Get form values
   const productData = {
@@ -146,23 +154,29 @@ productForm.addEventListener('submit', async (e) => {
     lastUpdated: new Date().toISOString()
   };
 
+  console.log('Product data prepared:', productData);
+
   try {
     // Check if product ID already exists
+    console.log('Checking for duplicate product ID...');
     const productsRef = ref(database, 'products');
-    const productQuery = query(
-      productsRef,
-      orderByChild('productId'),
-      equalTo(productData.productId)
-    );
-
-    const snapshot = await new Promise((resolve, reject) => {
-      onValue(productQuery, resolve, reject, { onlyOnce: true });
-    });
+    const snapshot = await get(productsRef);
 
     if (snapshot.exists()) {
-      showAlert('Product ID already exists. Please use a unique Product ID.', 'error');
-      return;
+      const products = snapshot.val();
+      const duplicateFound = Object.values(products).some(
+        product => product.productId === productData.productId
+      );
+
+      if (duplicateFound) {
+        showAlert('Product ID already exists. Please use a unique Product ID.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Product';
+        return;
+      }
     }
+
+    console.log('No duplicate found, creating product...');
 
     // Create product in database
     const newProductRef = push(ref(database, 'products'));
@@ -171,15 +185,25 @@ productForm.addEventListener('submit', async (e) => {
       firebaseId: newProductRef.key
     });
 
-    showAlert('Product created successfully! This product is now available across all systems.', 'success');
+    console.log('Product created successfully with ID:', newProductRef.key);
+
+    showAlert('✅ Product created successfully! This product is now available across all systems.', 'success');
     productForm.reset();
+
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create Product';
 
     // Scroll to top to show success message
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
   } catch (error) {
     console.error('Error creating product:', error);
-    showAlert('Failed to create product: ' + error.message, 'error');
+    showAlert('❌ Failed to create product: ' + error.message, 'error');
+    
+    // Re-enable submit button
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create Product';
   }
 });
 
@@ -195,7 +219,7 @@ function showAlert(message, type) {
   }, 5000);
 }
 
-// Generate unique product ID (helper function - optional)
+// Generate unique product ID (helper function)
 function generateProductId() {
   const timestamp = Date.now().toString(36);
   const randomStr = Math.random().toString(36).substring(2, 7);
@@ -212,4 +236,4 @@ document.getElementById('productId').addEventListener('focus', function() {
   }
 });
 
-console.log('Manufacturer Dashboard Initialized');
+console.log('Manufacturer Dashboard Initialized - Ready for product creation');
