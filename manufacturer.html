@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manufacturer Dashboard - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Mobile-First Hamburger Menu Styles */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .menu-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .menu-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .menu-items {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .menu-items li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .menu-items button {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .menu-items button:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        .menu-items button.danger {
+            color: #dc3545;
+        }
+
+        .menu-items button.danger:hover {
+            background: #fff5f5;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 80px 20px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .action-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .action-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .request-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Section Container */
+        .section-container {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .section-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-header h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin: 0;
+        }
+
+        /* Product Form Styles */
+        .product-form {
+            max-width: 100%;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section-title {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Product List Styles */
+        .products-list-container {
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .product-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .product-card-header h3 {
+            color: #333;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .product-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .product-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .product-detail-item {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .product-detail-item strong {
+            color: #667eea;
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .product-card-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 70px 10px 10px;
+            }
+
+            .action-card {
+                padding: 25px 15px;
+            }
+
+            .action-card-icon {
+                font-size: 40px;
+            }
+
+            .section-container {
+                padding: 20px 15px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger-btn" id="hamburger-btn">☰</button>
+
+    <!-- Side Menu -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h2>Manufacturer Menu</h2>
+            <p id="user-business-name" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
+        </div>
+        <ul class="menu-items">
+            <li><button id="menu-create-product">📦 Create Product</button></li>
+            <li><button id="menu-edit-product">✏️ Edit Product</button></li>
+            <li><button id="menu-logout" class="danger">🚪 Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Dashboard View -->
+        <div id="dashboard-view">
+            <div class="dashboard-header">
+                <h1>Manufacturer Dashboard</h1>
+                <p style="color: #666;">Manage your products and operations</p>
+            </div>
+
+            <div class="dashboard-actions">
+                <div class="action-card" id="stock-btn">
+                    <div class="action-card-icon">📊</div>
+                    <h3>Stock</h3>
+                    <p>Manage inventory levels</p>
+                </div>
+                <div class="action-card" id="sell-btn">
+                    <div class="action-card-icon">🛒</div>
+                    <h3>Go to Sell</h3>
+                    <p>Process sales orders</p>
+                    <span class="request-badge hidden" id="request-badge">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Product Section -->
+        <div id="create-product-section" class="section-container">
+            <div class="section-header">
+                <h2>Create New Product</h2>
+                <button class="btn btn-secondary btn-sm" id="back-to-dashboard">← Back</button>
+            </div>
+
+            <form id="create-product-form" class="product-form">
+                <div class="form-section">
+                    <div class="form-section-title">Basic Information</div>
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Product ID *</label>
+                        <input type="text" id="product-id" required>
+                        <small>Unique identifier for this product</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">EBM Required Fields</div>
+                    
+                    <div class="form-group">
+                        <label>Unit of Measure *</label>
+                        <select id="unit-of-measure" required>
+                            <option value="">Select Unit</option>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="l">Liter (l)</option>
+                            <option value="ml">Milliliter (ml)</option>
+                            <option value="bottle">Bottle</option>
+                            <option value="packet">Packet</option>
+                            <option value="box">Box</option>
+                            <option value="piece">Piece</option>
+                            <option value="carton">Carton</option>
+                            <option value="bag">Bag</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tax Category *</label>
+                        <select id="tax-category" required>
+                            <option value="">Select Tax Category</option>
+                            <option value="A">A - Standard Rate</option>
+                            <option value="B">B - Exempt</option>
+                            <option value="C">C - Zero Rated</option>
+                            <option value="D">D - Special Rate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>VAT Type *</label>
+                        <select id="vat-type" required>
+                            <option value="">Select VAT Type</option>
+                            <option value="18">18% VAT</option>
+                            <option value="0">0% VAT (Zero Rated)</option>
+                            <option value="exempt">Exempt</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Category *</label>
+                        <select id="product-category" required>
+                            <option value="">Select Category</option>
+                            <option value="food">Food & Beverages</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing & Textiles</option>
+                            <option value="pharmaceuticals">Pharmaceuticals</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="agriculture">Agriculture</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Classification *</label>
+                        <select id="item-classification" required>
+                            <option value="">Select Classification</option>
+                            <option value="raw-material">Raw Material</option>
+                            <option value="finished-goods">Finished Goods</option>
+                            <option value="semi-finished">Semi-Finished Goods</option>
+                            <option value="consumable">Consumable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pricing Type *</label>
+                        <select id="pricing-type" required>
+                            <option value="">Select Pricing Type</option>
+                            <option value="fixed">Fixed Price</option>
+                            <option value="variable">Variable Price</option>
+                            <option value="negotiable">Negotiable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unit Price (RWF) *</label>
+                        <input type="number" id="unit-price" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="product-description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-large">Create Product</button>
+                </div>
+            </form>
+
+            <div id="message-create" class="message"></div>
+        </div>
+
+        <!-- Edit Product Section -->
+        <div id="edit-product-section" class="section-container">
+            <div class="section-header">
+                <h2>Edit Product</h2>
+                <button class="btn btn-secondary btn-sm" id="back-to-dashboard-edit">← Back</button>
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="search-products" placeholder="Search products by name or ID...">
+            </div>
+
+            <div id="products-list" class="products-list-container">
+                <div class="loading-spinner">Loading products...</div>
+            </div>
+
+            <div id="message-edit" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Edit Product Details</h2>
+            
+            <form id="edit-product-form" class="product-form">
+                <input type="hidden" id="edit-product-doc-id">
+                
+                <div class="form-section">
+                    <div class="form-section-title">Basic Information</div>
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" id="edit-product-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Product ID *</label>
+                        <input type="text" id="edit-product-id" required disabled>
+                        <small>Product ID cannot be changed</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">EBM Required Fields</div>
+                    
+                    <div class="form-group">
+                        <label>Unit of Measure *</label>
+                        <select id="edit-unit-of-measure" required>
+                            <option value="kg">Kilogram (kg)</option>
+                            <option value="g">Gram (g)</option>
+                            <option value="l">Liter (l)</option>
+                            <option value="ml">Milliliter (ml)</option>
+                            <option value="bottle">Bottle</option>
+                            <option value="packet">Packet</option>
+                            <option value="box">Box</option>
+                            <option value="piece">Piece</option>
+                            <option value="carton">Carton</option>
+                            <option value="bag">Bag</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tax Category *</label>
+                        <select id="edit-tax-category" required>
+                            <option value="A">A - Standard Rate</option>
+                            <option value="B">B - Exempt</option>
+                            <option value="C">C - Zero Rated</option>
+                            <option value="D">D - Special Rate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>VAT Type *</label>
+                        <select id="edit-vat-type" required>
+                            <option value="18">18% VAT</option>
+                            <option value="0">0% VAT (Zero Rated)</option>
+                            <option value="exempt">Exempt</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Category *</label>
+                        <select id="edit-product-category" required>
+                            <option value="food">Food & Beverages</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing & Textiles</option>
+                            <option value="pharmaceuticals">Pharmaceuticals</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="agriculture">Agriculture</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Classification *</label>
+                        <select id="edit-item-classification" required>
+                            <option value="raw-material">Raw Material</option>
+                            <option value="finished-goods">Finished Goods</option>
+                            <option value="semi-finished">Semi-Finished Goods</option>
+                            <option value="consumable">Consumable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pricing Type *</label>
+                        <select id="edit-pricing-type" required>
+                            <option value="fixed">Fixed Price</option>
+                            <option value="variable">Variable Price</option>
+                            <option value="negotiable">Negotiable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unit Price (RWF) *</label>
+                        <input type="number" id="edit-unit-price" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="edit-product-description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Your JS -->
+    <script type="module" src="manufacturer.js"></script>
+</body>
+</html>
