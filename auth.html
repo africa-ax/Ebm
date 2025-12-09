@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .role-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .role-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .role-card-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .role-card h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .role-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rwanda Commerce</h1>
+            <a href="index.html" class="btn-back">← Back to Home</a>
+        </header>
+        
+        <main>
+            <div class="auth-container">
+                <!-- Tab Buttons -->
+                <div class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Login</button>
+                    <button class="tab-btn" data-tab="register">Register</button>
+                </div>
+                
+                <!-- ========== LOGIN TAB ========== -->
+                <div id="login-tab" class="tab-content active">
+                    <h2>Login</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                    <div class="forgot-password">
+                        <a href="#" id="forgot-password-link">Forgot Password?</a>
+                    </div>
+                </div>
+                
+                <!-- ========== REGISTER TAB ========== -->
+                <div id="register-tab" class="tab-content">
+                    <!-- Step 1: Role Selection -->
+                    <div id="role-selection-view">
+                        <h2>Select Your Role</h2>
+                        <p style="color: #666; text-align: center; margin-bottom: 20px;">Choose how you want to use the platform</p>
+                        
+                        <div class="role-selection">
+                            <div class="role-card" data-role="buyer">
+                                <div class="role-card-icon">🛍️</div>
+                                <h3>Buyer</h3>
+                                <p style="font-size: 13px; color: #888; margin-top: 8px;">Purchase products</p>
+                            </div>
+                            
+                            <div class="role-card" data-role="manufacturer">
+                                <div class="role-card-icon">🏭</div>
+                                <h3>Manufacturer</h3>
+                                <p style="font-size: 13px; color: #888; margin-top: 8px;">Create & sell products</p>
+                            </div>
+                            
+                            <div class="role-card" data-role="distributor">
+                                <div class="role-card-icon">🚚</div>
+                                <h3>Distributor</h3>
+                                <p style="font-size: 13px; color: #888; margin-top: 8px;">Buy & resell</p>
+                            </div>
+                            
+                            <div class="role-card" data-role="retailer">
+                                <div class="role-card-icon">🏪</div>
+                                <h3>Retailer</h3>
+                                <p style="font-size: 13px; color: #888; margin-top: 8px;">Sell to customers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Buyer Registration Form -->
+                    <div id="buyer-register-view" class="hidden">
+                        <button class="back-btn" id="back-from-buyer">← Back to Role Selection</button>
+                        <h2>Buyer Registration</h2>
+                        <form id="buyer-register-form">
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="buyer-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password *</label>
+                                <input type="password" id="buyer-password" required minlength="6">
+                                <small>Minimum 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" id="buyer-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number *</label>
+                                <input type="tel" id="buyer-phone" required pattern="[0-9]{10}" placeholder="0781234567">
+                                <small>10-digit phone number (e.g., 0781234567)</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Register as Buyer</button>
+                        </form>
+                    </div>
+
+                    <!-- Step 3: Business Registration Form -->
+                    <div id="business-register-view" class="hidden">
+                        <button class="back-btn" id="back-from-business">← Back to Role Selection</button>
+                        <h2 id="business-form-title">Business Registration</h2>
+                        <form id="business-register-form">
+                            <input type="hidden" id="business-role">
+                            
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="business-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Password *</label>
+                                <input type="password" id="business-password" required minlength="6">
+                                <small>Minimum 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Business Name *</label>
+                                <input type="text" id="business-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Business TIN *</label>
+                                <input type="text" id="business-tin" required pattern="[0-9]{9}" maxlength="9">
+                                <small>9-digit TIN number</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Business Address</label>
+                                <textarea id="business-address" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Contact Phone *</label>
+                                <input type="tel" id="business-phone" required pattern="[0-9]{10}" placeholder="0781234567">
+                                <small>10-digit phone number</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="business-submit-btn">Register Business</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Password Reset Modal -->
+                <div id="reset-password-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" id="close-reset-modal">&times;</span>
+                        <h2>Reset Password</h2>
+                        <p style="color: #666; margin-bottom: 20px;">Enter your email address and we'll send you a password reset link.</p>
+                        <form id="reset-password-form">
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" id="reset-email" required>
+                            </div>
+                            <div class="modal-actions">
+                                <button type="button" class="btn btn-secondary" id="cancel-reset">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div id="message" class="message"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Your JS -->
+    <script type="module" src="auth.js"></script>
+</body>
+</html>
