@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hamburger Menu */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .menu-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .menu-items {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .menu-items li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .menu-items button, .menu-items a {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .menu-items button:hover, .menu-items a:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        .menu-items .create-order-btn {
+            background: #28a745;
+            color: white;
+            margin: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .menu-items .create-order-btn:hover {
+            background: #218838;
+            padding-left: 20px;
+        }
+
+        /* Container */
+        .seller-container {
+            padding: 80px 20px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .seller-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .role-info {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* Quick Action */
+        .quick-action-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .quick-action-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+        }
+
+        .quick-action-info p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 14px;
+        }
+
+        .create-order-large-btn {
+            background: white;
+            color: #28a745;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-order-large-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Tabs */
+        .order-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Orders Table */
+        .orders-section {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .orders-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .orders-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-invoiced {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #5568d3;
+        }
+
+        /* Order Detail Modal */
+        .order-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .order-modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+        }
+
+        .detail-title {
+            font-size: 14px;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .items-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #667eea;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        /* Rejection Modal */
+        .reject-reason {
+            margin-top: 15px;
+        }
+
+        .reject-reason label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .reject-reason textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .seller-container {
+                padding: 70px 10px 10px;
+            }
+
+            .orders-table {
+                font-size: 12px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 10px 8px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .quick-action-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .create-order-large-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <button class="hamburger-btn" id="hamburger-btn">☰</button>
+
+    <!-- Side Menu -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h2>Seller Menu</h2>
+            <p id="user-name" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
+        </div>
+        <ul class="menu-items">
+            <li><a href="#" id="menu-dashboard">🏠 Dashboard</a></li>
+            <li><a href="stock.html">📊 Your Stock</a></li>
+            <li><a href="seller.html" style="color: #667eea; font-weight: 600;">📦 Orders</a></li>
+            <li><a href="invoices.html">📄 Invoices</a></li>
+            <li class="create-order-btn" id="menu-create-order">🛒 Create Order Manually</li>
+            <li><button id="menu-logout" style="color: #dc3545;">🚪 Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="seller-container">
+        <!-- Header -->
+        <div class="seller-header">
+            <div>
+                <h1 style="color: #667eea; margin: 0 0 5px 0;">Order Management</h1>
+                <p style="color: #666; margin: 0;" id="user-info">Loading...</p>
+            </div>
+            <div class="role-info" id="role-badge">Loading...</div>
+        </div>
+
+        <!-- Quick Action for Retailers -->
+        <div class="quick-action-section" id="quick-action-retailer" style="display: none;">
+            <div class="quick-action-info">
+                <h3>💳 Walk-In Customer?</h3>
+                <p>Create orders for customers who don't use the app</p>
+            </div>
+            <button class="create-order-large-btn" id="create-order-btn">
+                🛒 Create Order Manually
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-label">Pending Orders</div>
+                <div class="summary-value" id="summary-pending">0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Approved Today</div>
+                <div class="summary-value" id="summary-approved">0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Total Revenue (Pending)</div>
+                <div class="summary-value" style="color: #667eea;" id="summary-revenue">0 RWF</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="order-tabs">
+            <button class="tab-btn active" data-tab="pending-tab">
+                Pending Orders
+                <span class="tab-badge" id="pending-badge" style="display: none;">0</span>
+            </button>
+            <button class="tab-btn" data-tab="approved-tab">Approved Orders</button>
+            <button class="tab-btn" data-tab="rejected-tab">Rejected Orders</button>
+            <button class="tab-btn" data-tab="invoiced-tab">Invoiced Orders</button>
+        </div>
+
+        <!-- Pending Orders Tab -->
+        <div id="pending-tab" class="tab-content active">
+            <div class="orders-section">
+                <div class="section-header">
+                    <h3>Pending Orders Awaiting Action</h3>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer/Business</th>
+                            <th>Order ID</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-orders-body">
+                        <tr><td colspan="6" class="loading">Loading pending orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Approved Orders Tab -->
+        <div id="approved-tab" class="tab-content">
+            <div class="orders-section">
+                <div class="section-header">
+                    <h3>Approved Orders</h3>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer/Business</th>
+                            <th>Order ID</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approved-orders-body">
+                        <tr><td colspan="7" class="loading">Loading approved orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Rejected Orders Tab -->
+        <div id="rejected-tab" class="tab-content">
+            <div class="orders-section">
+                <div class="section-header">
+                    <h3>Rejected Orders</h3>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer/Business</th>
+                            <th>Order ID</th>
+                            <th>Items</th>
+                            <th>Total Amount</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rejected-orders-body">
+                        <tr><td colspan="6" class="loading">Loading rejected orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Invoiced Orders Tab -->
+        <div id="invoiced-tab" class="tab-content">
+            <div class="orders-section">
+                <div class="section-header">
+                    <h3>Invoiced Orders (EBM Issued)</h3>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer/Business</th>
+                            <th>Order ID</th>
+                            <th>Invoice ID</th>
+                            <th>Total Amount</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiced-orders-body">
+                        <tr><td colspan="6" class="loading">Loading invoiced orders...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="order-modal" class="order-modal">
+        <div class="order-modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Order Details</h2>
+                <span class="close" id="close-order-modal" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body" id="order-modal-body">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="modal-footer" id="order-modal-footer">
+                <!-- Action buttons will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Reason Modal -->
+    <div id="reject-modal" class="order-modal">
+        <div class="order-modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 style="margin: 0;">Reject Order</h2>
+                <span class="close" id="close-reject-modal" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="color: #666; margin-bottom: 15px;">Are you sure you want to reject this order?</p>
+                <div class="reject-reason">
+                    <label for="reject-reason-input">Reason for Rejection (Optional)</label>
+                    <textarea id="reject-reason-input" placeholder="Enter reason for rejection..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-reject">Cancel</button>
+                <button class="btn btn-danger" id="confirm-reject">Reject Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- EBM Mock -->
+    <script src="ebmMock.js"></script>
+
+    <!-- Your JS -->
+    <script type="module" src="seller.js"></script>
+</body>
+</html>
