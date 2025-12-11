@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Products - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hamburger Menu */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .menu-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .menu-items {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .menu-items li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .menu-items button {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .menu-items button:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        /* Main Container */
+        .buyer-container {
+            padding: 80px 20px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .buyer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cart-btn-container {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Recent Sellers */
+        .recent-sellers-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .recent-sellers-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .recent-sellers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .recent-seller-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .recent-seller-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .recent-seller-card strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .recent-seller-card small {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-results {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .seller-result {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .seller-result:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .seller-result strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .seller-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Selected Seller */
+        .selected-seller-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .selected-seller-section.show {
+            display: block;
+        }
+
+        .clear-selection-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        /* Products Table */
+        .products-section {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .products-section.show {
+            display: block;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: #667eea;
+            color: white;
+        }
+
+        .products-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .products-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .products-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .price-cell {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .add-to-cart-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background: #218838;
+        }
+
+        .add-to-cart-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Cart Modal */
+        .cart-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .cart-modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .cart-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qty-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .qty-display {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .item-total {
+            font-size: 16px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .remove-item-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 2px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .cart-total-amount {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Loading & Messages */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .buyer-container {
+                padding: 70px 10px 10px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recent-sellers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .products-table {
+                font-size: 12px;
+            }
+
+            .products-table th,
+            .products-table td {
+                padding: 10px 8px;
+            }
+
+            .cart-item-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu -->
+    <button class="hamburger-btn" id="hamburger-btn">☰</button>
+
+    <!-- Side Menu -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h2>Menu</h2>
+            <p id="user-name" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
+        </div>
+        <ul class="menu-items">
+            <li><button id="menu-invoices">📄 Invoices</button></li>
+            <li id="menu-dashboard-item" style="display: none;"><button id="menu-dashboard">🏠 Back to Dashboard</button></li>
+            <li><button id="menu-logout" style="color: #dc3545;">🚪 Logout</button></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="buyer-container">
+        <div class="buyer-header">
+            <div>
+                <h1 style="color: #667eea; margin: 0;">Buy Products</h1>
+                <p style="color: #666; margin-top: 5px;" id="role-info">Loading...</p>
+            </div>
+            <div class="cart-btn-container">
+                <button class="btn btn-primary" id="view-cart-btn">
+                    🛒 View Cart
+                    <span class="cart-badge" id="cart-badge" style="display: none;">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Sellers -->
+        <div class="recent-sellers-section" id="recent-sellers-section" style="display: none;">
+            <h3>Recent Sellers (Last 5)</h3>
+            <div class="recent-sellers-grid" id="recent-sellers-grid">
+                <!-- Recent sellers will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h3>Search for Sellers</h3>
+            <div class="search-grid">
+                <input type="text" class="search-input" id="search-input" placeholder="Search by business name, TIN, or location...">
+                <button class="btn btn-primary" id="search-btn">Search</button>
+            </div>
+            <div class="search-results" id="search-results"></div>
+        </div>
+
+        <!-- Selected Seller -->
+        <div class="selected-seller-section" id="selected-seller-section">
+            <h3 style="margin: 0 0 10px 0;">Shopping from:</h3>
+            <h2 style="margin: 0;" id="selected-seller-name">-</h2>
+            <p style="margin: 5px 0 0 0; opacity: 0.9;" id="selected-seller-info">-</p>
+            <button class="clear-selection-btn" id="clear-selection-btn">Change Seller</button>
+        </div>
+
+        <!-- Products Table -->
+        <div class="products-section" id="products-section">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Unit</th>
+                        <th>Available</th>
+                        <th id="price-header">Price</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="products-table-body">
+                    <tr>
+                        <td colspan="5" class="loading">Select a seller to view products</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-header">
+                <h2 style="margin: 0;">Your Cart</h2>
+                <span class="close" id="close-cart-modal" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="cart-body" id="cart-body">
+                <div class="empty-cart">
+                    <p>Your cart is empty</p>
+                </div>
+            </div>
+            <div class="cart-footer" id="cart-footer" style="display: none;">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="cart-total-amount" id="cart-total-amount">0 RWF</span>
+                </div>
+                <div class="cart-actions">
+                    <button class="btn btn-secondary" id="clear-cart-btn">Clear Cart</button>
+                    <button class="btn btn-success" id="place-order-btn" style="flex: 1;">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Your JS -->
+    <script type="module" src="buyer.js"></script>
+</body>
+</html>
