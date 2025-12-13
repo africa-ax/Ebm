@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manufacturer Dashboard - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Mobile-First Hamburger Menu Styles */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .menu-overlay.active {
+            display: block;
+        }
+
+        .menu-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .menu-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .menu-items {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .menu-items li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .menu-items button {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .menu-items button:hover {
+            background: #f8f9fa;
+            color: #667eea;
+            padding-left: 25px;
+        }
+
+        .menu-items button.danger {
+            color: #dc3545;
+        }
+
+        .menu-items button.danger:hover {
+            background: #fff5f5;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 80px 20px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .action-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .action-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .request-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Section Container */
+        .section-container {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .section-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-header h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin: 0;
+        }
+
+        /* Product Form Styles */
+        .product-form {
+            max-width: 100%;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section-title {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Form Group */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+        
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Product List Styles */
+        .products-list-container {
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .product-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .product-card-header h3 {
+            color: #333;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .product-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .product-card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-card-details strong {
+            color: #555;
+            font-weight: 600;
+            display: block;
+        }
+
+        .product-card-details span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .product-description {
+            color: #666;
+            font-style: italic;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Utility/Message Styles */
+        .btn {
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #5a6cd4;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-actions {
+                grid-template-columns: 1fr;
+            }
+            .product-card-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <button class="hamburger-btn" id="hamburger-btn">☰</button>
+    <div class="menu-overlay" id="menu-overlay"></div>
+
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <h2 id="user-business-name">Manufacturer</h2>
+        </div>
+        <ul class="menu-items">
+            <li><button id="menu-create-product">Create New Product (Full Details)</button></li>
+            <li><button id="menu-edit-product">Manage My Products</button></li>
+            <li><button id="menu-requests"><i class="fas fa-inbox"></i> Purchase Requests <span class="request-badge hidden" id="request-badge"></span></button></li>
+            <li><button id="menu-logout" class="danger"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div id="dashboard-view">
+            <div class="dashboard-header">
+                <h1>Manufacturer Dashboard</h1>
+                <p>Manage your products, stock, and sales channels.</p>
+            </div>
+            
+            <div class="dashboard-actions">
+                <div class="action-card" id="stock-btn">
+                    <div class="action-card-icon">📦</div>
+                    <h3>Stock Management</h3>
+                    <p>Update quantities of your existing products.</p>
+                </div>
+                <div class="action-card" id="sell-btn">
+                    <div class="action-card-icon">💰</div>
+                    <h3>Invoice Generation</h3>
+                    <p>Generate sales invoices for your B2B customers.</p>
+                </div>
+                <div class="action-card" id="buy-btn">
+                    <div class="action-card-icon">🛒</div>
+                    <h3>Purchase Raw Materials</h3>
+                    <p>Access the buyer platform to purchase materials.</p>
+                </div>
+            </div>
+            
+            <div id="requests-summary" class="dashboard-actions" style="margin-top: 20px;">
+                <div class="action-card" id="requests-btn" onclick="document.getElementById('menu-requests').click()">
+                    <div class="action-card-icon">📬</div>
+                    <h3>New Purchase Requests</h3>
+                    <p>Review and act on pending seller requests.</p>
+                    <span class="request-badge hidden" id="summary-request-badge"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container" id="create-product-section">
+            <div class="section-header">
+                <h2>Create New Product (Public & Full Details)</h2>
+                <button class="btn btn-secondary" id="back-to-dashboard">Back to Dashboard</button>
+            </div>
+            <div id="message-create" class="message hidden"></div>
+
+            <form class="product-form" id="create-product-form">
+                
+                <div class="form-section">
+                    <div class="form-section-title">Product Identification</div>
+                    
+                    <div class="form-group">
+                        <label for="product-name">Product Name *</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-id">Product ID (Unique Identifier) *</label>
+                        <input type="text" id="product-id" required>
+                        <small>This ID must be unique across all your products.</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">EBM Required Fields</div>
+                    
+                    <div class="form-group">
+                        <label for="unit-of-measure">Unit of Measure *</label>
+                        <select id="unit-of-measure" required>
+                            <option value="">Select UoM</option>
+                            <option value="PCS">Pieces (PCS)</option>
+                            <option value="KG">Kilograms (KG)</option>
+                            <option value="L">Litres (L)</option>
+                            <option value="M">Meters (M)</option>
+                            <option value="BX">Box (BX)</option>
+                            <option value="OTH">Other (OTH)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tax-category">Tax Category *</label>
+                        <select id="tax-category" required>
+                            <option value="">Select Tax Category</option>
+                            <option value="A">A (Standard)</option>
+                            <option value="B">B (Reduced/Exempt)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>VAT Type *</label>
+                        <select id="vat-type" required>
+                            <option value="">Select VAT Type</option>
+                            <option value="18">18% VAT</option>
+                            <option value="0">0% VAT (Zero Rated)</option>
+                            <option value="exempt">Exempt</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Category *</label>
+                        <select id="product-category" required>
+                            <option value="">Select Category</option>
+                            <option value="food">Food & Beverages</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing & Textiles</option>
+                            <option value="pharmaceuticals">Pharmaceuticals</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="agriculture">Agriculture</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Classification *</label>
+                        <select id="item-classification" required>
+                            <option value="">Select Classification</option>
+                            <option value="goods">Goods</option>
+                            <option value="service">Service</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Pricing & Details</div>
+
+                    <div class="form-group">
+                        <label>Pricing Type *</label>
+                        <select id="pricing-type" required>
+                            <option value="fixed">Fixed Price</option>
+                            <option value="variable">Variable Price</option>
+                            <option value="negotiable">Negotiable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unit Price (RWF) *</label>
+                        <input type="number" id="unit-price" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="product-description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Create Product & Make Public</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section-container" id="edit-product-section">
+            <div class="section-header">
+                <h2>Manage My Products</h2>
+                <button class="btn btn-secondary" id="back-to-dashboard-edit">Back to Dashboard</button>
+            </div>
+            <div id="message-edit" class="message hidden"></div>
+
+            <div class="products-list-container" id="products-list">
+                </div>
+        </div>
+        
+        <div class="section-container" id="requests-section">
+            <div class="section-header">
+                <h2>Pending Purchase Requests</h2>
+                <button class="btn btn-secondary" id="back-to-dashboard-requests">Back to Dashboard</button>
+            </div>
+            <div id="requests-list-container">
+                <p>Purchase request handling logic goes here.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="edit-product-modal" class="modal edit-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Edit Product Details</h3>
+            <div id="message-edit-modal" class="message hidden"></div>
+            
+            <form class="product-form" id="edit-product-form">
+                <input type="hidden" id="edit-doc-id">
+                
+                <div class="form-section">
+                    <div class="form-section-title">Product Identification</div>
+                    
+                    <div class="form-group">
+                        <label for="edit-product-name">Product Name *</label>
+                        <input type="text" id="edit-product-name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-id">Product ID (Unique Identifier) *</label>
+                        <input type="text" id="edit-product-id" required disabled>
+                        <small>Product ID cannot be changed</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">EBM Required Fields</div>
+                    
+                    <div class="form-group">
+                        <label>Unit of Measure *</label>
+                        <select id="edit-unit-of-measure" required>
+                            <option value="PCS">Pieces (PCS)</option>
+                            <option value="KG">Kilograms (KG)</option>
+                            <option value="L">Litres (L)</option>
+                            <option value="M">Meters (M)</option>
+                            <option value="BX">Box (BX)</option>
+                            <option value="OTH">Other (OTH)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-tax-category">Tax Category *</label>
+                        <select id="edit-tax-category" required>
+                            <option value="A">A (Standard)</option>
+                            <option value="B">B (Reduced/Exempt)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>VAT Type *</label>
+                        <select id="edit-vat-type" required>
+                            <option value="18">18% VAT</option>
+                            <option value="0">0% VAT (Zero Rated)</option>
+                            <option value="exempt">Exempt</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Product Category *</label>
+                        <select id="edit-product-category" required>
+                            <option value="food">Food & Beverages</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing & Textiles</option>
+                            <option value="pharmaceuticals">Pharmaceuticals</option>
+                            <option value="construction">Construction Materials</option>
+                            <option value="agriculture">Agriculture</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Item Classification *</label>
+                        <select id="edit-item-classification" required>
+                            <option value="goods">Goods</option>
+                            <option value="service">Service</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Pricing & Details</div>
+
+                    <div class="form-group">
+                        <label>Pricing Type *</label>
+                        <select id="edit-pricing-type" required>
+                            <option value="fixed">Fixed Price</option>
+                            <option value="variable">Variable Price</option>
+                            <option value="negotiable">Negotiable</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unit Price (RWF) *</label>
+                        <input type="number" id="edit-unit-price" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="edit-product-description" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <script type="module" src="manufacturer.js"></script>
+</body>
+</html>
