@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management - Rwanda Commerce</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Stock Table Styles */
+        .stock-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stock-header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .inventory-section-title {
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #2d3748;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .search-filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-filter-section input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Stock Table */
+        .stock-table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        .stock-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+        }
+
+        .stock-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Styling for the Resource table header */
+        .resource-header thead {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        /* HIDDEN BY DEFAULT: Acquired Resources section */
+        #resources-section {
+            display: none;
+        }
+
+        .stock-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stock-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s;
+        }
+
+        .stock-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stock-table td {
+            padding: 15px;
+            font-size: 14px;
+            color: #333;
+            vertical-align: middle;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .btn-set-price {
+            background: #667eea;
+            color: white;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* Modal Styles */
+        .price-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .price-modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="stock-container">
+        <a href="#" id="back-link" class="back-link">← Back to Dashboard</a>
+        
+        <div class="stock-header">
+            <h1>Inventory Management</h1>
+            <span id="role-badge" class="role-badge"></span>
+        </div>
+
+        <div class="search-filter-section">
+            <input type="text" id="search-stock" placeholder="Search products, materials, or suppliers...">
+        </div>
+
+        <h2 class="inventory-section-title" id="main-stock-title">📦 Inventory Stock</h2>
+        <div class="stock-table-container">
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Product Name</th>
+                        <th>SKU/Product ID</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Status</th>
+                        <th>Purchase Price</th>
+                        <th id="price-column-header">Selling Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="stock-body">
+                    <tr><td colspan="8" style="text-align: center; padding: 30px;">Loading inventory...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="resources-section">
+            <h2 class="inventory-section-title">🛠️ Acquired Resources (Internal Use Only)</h2>
+            <div class="stock-table-container resource-header">
+                <table class="stock-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">Material Name</th>
+                            <th>ID</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                            <th>Status</th>
+                            <th>Cost Basis</th>
+                            <th>Usage</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resources-body">
+                        <tr><td colspan="8" style="text-align: center; padding: 30px;">No resources acquired.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="price-modal" class="price-modal">
+            <div class="price-modal-content">
+                <h2>Set Selling Price</h2>
+                <form id="set-price-form">
+                    <input type="hidden" id="price-stock-id">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="price-product-name" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Cost Price (RWF)</label>
+                        <input type="text" id="price-purchase-price" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Selling Price (RWF) *</label>
+                        <input type="number" id="price-selling-price" step="1" min="0" required>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button type="button" class="action-btn" style="background:#e2e8f0;" id="cancel-price">Cancel</button>
+                        <button type="submit" class="action-btn btn-set-price">Save Price</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="stock-modal" class="price-modal">
+            <div class="price-modal-content">
+                <h2>Update Stock Level</h2>
+                <form id="update-stock-form">
+                    <input type="hidden" id="update-stock-id">
+                    <div class="form-group">
+                        <label>Current Quantity</label>
+                        <input type="number" id="current-stock-qty" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>New Quantity</label>
+                        <input type="number" id="new-stock-qty" min="0" required>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button type="button" class="action-btn" style="background:#e2e8f0;" onclick="document.getElementById('stock-modal').style.display='none'">Cancel</button>
+                        <button type="submit" class="action-btn btn-set-price">Update Quantity</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="stock.js"></script>
+</body>
+</html>
