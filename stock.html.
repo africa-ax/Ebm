@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .stock-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .stock-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a202c;
+            border-bottom: 2px solid #4299e1;
+            padding-bottom: 10px;
+        }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .stock-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .stock-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .stock-card-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .stock-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .badge-inventory {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-raw {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .stock-details {
+            margin-bottom: 15px;
+        }
+
+        .stock-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .stock-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .stock-detail-row .label {
+            font-weight: 500;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .stock-detail-row .value {
+            font-weight: 600;
+            color: #2d3748;
+            text-align: right;
+        }
+
+        .quantity-value {
+            color: #2b6cb0;
+        }
+
+        .total-value {
+            color: #38a169;
+        }
+
+        .stock-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .loading, .empty-state, .error-state {
+            padding: 40px;
+            text-align: center;
+            color: #718096;
+            font-size: 1rem;
+        }
+
+        .error-state {
+            color: #e53e3e;
+        }
+
+        /* Price Update Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #2d3748;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #718096;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-btn:hover {
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3182ce;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .stock-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 20% 20px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stock-container">
+        <div class="stock-header">
+            <div>
+                <h1>Stock Management</h1>
+                <p id="user-business-name">Loading...</p>
+            </div>
+            <button id="back-btn" class="btn btn-secondary">Back to Dashboard</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Inventory Section -->
+        <div id="inventory-section" class="stock-section" style="display: none;">
+            <h2 class="section-title">📦 Inventory (Finished Goods)</h2>
+            <div id="inventory-list" class="stock-grid">
+                <div class="loading">Loading inventory...</div>
+            </div>
+        </div>
+
+        <!-- Raw Materials Section (Manufacturers Only) -->
+        <div id="raw-materials-section" class="stock-section" style="display: none;">
+            <h2 class="section-title">🧱 Raw Materials</h2>
+            <div id="raw-materials-list" class="stock-grid">
+                <div class="loading">Loading raw materials...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Update Modal -->
+    <div id="price-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Set Selling Price</h2>
+                <button id="close-price-modal" class="close-btn">&times;</button>
+            </div>
+            <form id="price-update-form">
+                <input type="hidden" id="price-modal-stock-id">
+                
+                <div class="form-group">
+                    <label>Product:</label>
+                    <p id="price-modal-product-name" style="margin: 0; color: #4a5568;"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="selling-price-input">Selling Price (RWF) *</label>
+                    <input 
+                        type="number" 
+                        id="selling-price-input" 
+                        min="0" 
+                        step="0.01" 
+                        required
+                        placeholder="Enter selling price">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancel-price-btn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Price</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="stock.js"></script>
+</body>
+</html>
