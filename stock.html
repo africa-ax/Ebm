@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management - Rwanda Commerce</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        :root {
+            --primary: #2563eb;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg: #f3f4f6;
+        }
+
+        .stock-container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .stock-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .stock-card { 
+            background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 5px solid #ddd;
+        }
+        .stock-card.inventory { border-left-color: var(--primary); }
+        .stock-card.raw_material { border-left-color: var(--warning); }
+
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .badge-inventory { background: #dbeafe; color: #1e40af; }
+        .badge-raw { background: #fef3c7; color: #92400e; }
+
+        .price-input-group { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+        .price-input { width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .section-title { margin: 25px 0 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
+        .hidden { display: none; }
+        
+        #message-toast {
+            position: fixed; bottom: 20px; right: 20px; padding: 15px 25px;
+            border-radius: 8px; color: white; display: none; z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button id="hamburger-btn">☰</button>
+        <h1 id="page-title">Stock Management</h1>
+        <div id="user-info">
+            <span id="user-business-name">Loading...</span>
+        </div>
+    </header>
+
+    <div id="side-menu" class="side-menu">
+        <div class="menu-header">Menu</div>
+        <nav>
+            <a href="#" id="menu-dashboard">Dashboard</a>
+            <a href="buyer.html">Buy Products</a>
+            <a href="seller.html">Sales/Orders</a>
+            <a href="#" id="menu-logout">Logout</a>
+        </nav>
+    </div>
+    <div id="menu-overlay" class="menu-overlay"></div>
+
+    <div class="stock-container">
+        <div class="stock-header">
+            <input type="text" id="stock-search" placeholder="Search by Product Name or ID..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+        </div>
+
+        <div id="inventory-section">
+            <h2 class="section-title">📦 Finished Goods / Inventory</h2>
+            <div id="inventory-grid" class="stock-grid">
+                <p class="loading">Loading stock...</p>
+            </div>
+        </div>
+
+        <div id="raw-materials-section" class="hidden">
+            <h2 class="section-title">🧱 Raw Materials</h2>
+            <div id="raw-materials-grid" class="stock-grid"></div>
+        </div>
+    </div>
+
+    <div id="price-modal" class="hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.3); z-index: 1001;">
+        <h3>Update Selling Price</h3>
+        <p id="modal-product-name"></p>
+        <input type="number" id="new-selling-price" class="price-input" placeholder="Enter RWF">
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button id="save-price-btn" class="btn btn-primary">Save</button>
+            <button id="close-modal-btn" class="btn">Cancel</button>
+        </div>
+    </div>
+
+    <div id="message-toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+    
+    <script type="module" src="stock.js"></script>
+</body>
+</html>
